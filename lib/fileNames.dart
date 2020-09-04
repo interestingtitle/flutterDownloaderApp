@@ -6,9 +6,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 var files= new List<String>();
+String serverIP="";
+String serverPORT="";
 int Counter = -1;
 String name = "";
-
+String appDirectory="";
 String fileDirection = "";
 String directory;
 List file = new List();
@@ -24,27 +26,7 @@ Future getJSONTest() async
   var res = await http.get(Uri.parse("http://192.168.43.199:8000/get_value"), headers: {"Accept": "application/json"});
   var resBody = json.decode(res.body);
   jsonFileData=resBody["filedata"] as List;
-
-  print("done");
+  print("Getting file list data from server : Done.");
 
 }
-//var systemTempDir = Directory("/storage/emulated/0/Android/data/bariscan.flutterdownloader/files/");
-
-
-
-
-//void getFileNamesInAppDirectory() {
-//  files.clear();
-//  systemTempDir.list(recursive: true, followLinks: false)
-//      .listen((FileSystemEntity entity) {
-//    String entityPath = entity.path;
-//    entityPath =
-//        entityPath.replaceAll("/storage/emulated/0/Android/data/bariscan.flutterdownloader/files/", "");
-//
-//    files.add(entityPath);
-//   print(entityPath + " " + files[Counter]);
-//
-//  });
-//
-//}
 

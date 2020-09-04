@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'dart:async';
 import 'dart:io';
 import 'dart:io' as io;
-
 import 'fileNames.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -17,9 +16,32 @@ import 'package:tap_debouncer/tap_debouncer.dart';
 import 'package:convert/convert.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:ping_discover_network/ping_discover_network.dart';
 import 'fileNames.dart';
 
+void discoverIpAddress() async {
+  // NetworkAnalyzer.discover pings PORT:IP one by one according to timeout.
+  // NetworkAnalyzer.discover2 pings all PORT:IP addresses at once.
+
+  const port = 8000;
+  final stream = NetworkAnalyzer.discover2(
+    '192.168.43',
+    port,
+    timeout: Duration(milliseconds: 5000),
+  );
+
+  int found = 0;
+  stream.listen((NetworkAddress addr) {
+     //print('${addr.ip}:$port');
+    if (addr.exists) {
+      found++;
+      print('Found device: ${addr.ip}:$port');
+      serverIP=addr.ip.toString();
+      serverPORT=port.toString();
+      return;
+    }
+  }).onDone(() => print('Finish. Found $found device(s)'));
+}
 
 Future printIps() async {
   for (var interface in await NetworkInterface.list()) {
@@ -39,7 +61,6 @@ void main() async{
   );
   runApp(downloader());
 
-
   var status = await Permission.storage.status;
 
   if (!status.isGranted) {
@@ -47,28 +68,23 @@ void main() async{
   }
 
 
-    //var appPath ='/storage/emulated/0/Android/data/bariscan.flutterdownloader/files';
-    //await Directory(appPath).create(recursive: true); // <-- 1
-
-
-    String directory = (await getApplicationDocumentsDirectory()).path;
-    String directoryTest = (await getExternalStorageDirectory()).path;
-    // List directory contents, recursing into sub-directories,
-    // but not following symbolic links.
+    appDirectory = (await getApplicationDocumentsDirectory()).path;
     printIps();
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
       // I am connected to a mobile network.
       getJSONTest();
+
     }
     else if (connectivityResult == ConnectivityResult.wifi) {
     // I am connected to a wifi network.
+      getJSONTest();
+      discoverIpAddress();
     }
     else {
         // I am not connected to the internet
     }
     var abc=ConnectivityResult.values;
-    var abce3="test";
 }
 
 class downloader extends StatelessWidget {
@@ -83,8 +99,6 @@ class downloader extends StatelessWidget {
 class flutterdownloader extends StatefulWidget {
   @override
 
-
-
   _flutterdownloaderState createState() => _flutterdownloaderState();
 }
 
@@ -94,15 +108,14 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 
   List<Task> tasks;
 
-
-
   @override
   void requestDownload(String downloadFile) async{
     //
     var rnd = new Random();
     final taskId = await FlutterDownloader.enqueue(
         //url: "https://duckduckgo.com/i/0227507d.png",
-        url: "http://192.168.43.199:8000/download/"+downloadFile,
+        url: "http://"+serverIP+":"+serverPORT+"/download/"+downloadFile,
+        //url: "http://192.168.43.199:8000"+"/download/"+downloadFile,
         headers: {"auth": "test_for_sql_encoding"},
         savedDir: '/storage/emulated/0/Android/data/bariscan.flutterdownloader/files',
         fileName: downloadFile,
@@ -126,6 +139,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 
   void compareFiles()
   {
+
     requestList.clear();
     Future.sync(() => getJSONTest);
     for(int i=0;i<10;i++)
@@ -144,7 +158,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
       print("Requested Filename: "+musicFileName);
       requestList.add(musicFileName);
       requestDownload(musicFileName);
-
+      _listofFiles();
     }
     print(requestList);
 
@@ -193,7 +207,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                     //openFile();;
                       Future.sync(() => getJSONTest());
                       compareFiles();
-                      _listofFiles();
+
                   });
                 },
               ),
@@ -211,8 +225,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                       setState(() {
                         _listofFiles();
                       });
-                      length = (length/1024);
-                      print(size);
+
                     },
 
                   ),
@@ -298,3 +311,4 @@ class Task {
     this.taskId = taskId;
   }
 }
+
