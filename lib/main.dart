@@ -190,8 +190,9 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                   setState(() {
                       _listofFiles();
                     //openFile();;
-                      getJSONTest();
+                      Future.sync(() => getJSONTest());
                       compareFiles();
+                      _listofFiles();
                   });
                 },
               ),
