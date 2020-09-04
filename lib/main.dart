@@ -121,7 +121,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
   void _listofFiles() async {
     directory = (await getApplicationDocumentsDirectory()).path;
     setState(() {
-      file = io.Directory("/storage/emulated/0/Android/data/bariscan.flutterdownloader/files").listSync();  //use your folder name insted of resume.
+      file = io.Directory("/storage/emulated/0/Android/data/bariscan.flutterdownloader/files").listSync();  //use your folder name instead of resume.
     });
   }
 
@@ -151,6 +151,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                   setState(() {
                     files.clear();
                     requestDownload();
+                    _listofFiles();
 
                   });
 
