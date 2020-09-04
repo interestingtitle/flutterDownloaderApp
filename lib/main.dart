@@ -14,9 +14,10 @@ import 'package:open_file/open_file.dart';
 import 'dart:math';
 import 'package:connectivity/connectivity.dart';
 import 'package:tap_debouncer/tap_debouncer.dart';
+import 'package:convert/convert.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-import 'fileNames.dart';
-import 'fileNames.dart';
 import 'fileNames.dart';
 
 
@@ -95,20 +96,17 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 
 
   @override
-  void requestDownload() async{
+  void requestDownload(String downloadFile) async{
     //
     var rnd = new Random();
     final taskId = await FlutterDownloader.enqueue(
-        url: "https://duckduckgo.com/i/0227507d.png",
-        //url: "http://192.168.43.199:8000/download",
+        //url: "https://duckduckgo.com/i/0227507d.png",
+        url: "http://192.168.43.199:8000/download/"+downloadFile,
         headers: {"auth": "test_for_sql_encoding"},
         savedDir: '/storage/emulated/0/Android/data/bariscan.flutterdownloader/files',
-        fileName: (rnd.nextInt(900000) + 100000 ).toString()+'.png',
+        fileName: downloadFile,
         showNotification: true,
         openFileFromNotification: true);
-  }
-  void openFile() async{
-    final result = await OpenFile.open((await getExternalStorageDirectory()).path+"/resim.png");
   }
 
   @override
@@ -125,6 +123,31 @@ class _flutterdownloaderState extends State<flutterdownloader> {
     });
   }
 
+  void compareFiles()
+  {
+    requestList.clear();
+    Future.sync(() => getJSONTest);
+    for(int i=0;i<10;i++)
+    {
+      String plainText=jsonFileData.elementAt(i).toString();
+      var plainTextArray=plainText.split("{filename: ");
+      //print(jsonFileData.elementAt(i));
+      //print(fileData.elementAt(i));
+      //print(plainTextArray);
+      //print( plainTextArray.elementAt(1));
+      plainText=plainTextArray.elementAt(1).toString();
+      //print(plainText);
+      plainTextArray=plainText.split(".mp3");
+      //print("->"+ plainTextArray.elementAt(0));
+      String musicFileName=plainTextArray.elementAt(0).toString()+".mp3";
+      print("Requested Filename: "+musicFileName);
+      requestList.add(musicFileName);
+      requestDownload(musicFileName);
+
+    }
+    print(requestList);
+
+  }
 
 
 
@@ -150,7 +173,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                 onPressed: (){
                   setState(() {
                     files.clear();
-                    requestDownload();
+                    requestDownload("1.mp3");
                     _listofFiles();
 
                   });
@@ -159,13 +182,16 @@ class _flutterdownloaderState extends State<flutterdownloader> {
               ),
             ),
             Tooltip(
-              message: 'Open File',
+              message: 'Sync Files',
               child: FlatButton(
                 color: Colors.blue,
                 child: Icon(Icons.folder_open),
                 onPressed: (){
                   setState(() {
-                    openFile();
+                      _listofFiles();
+                    //openFile();;
+                      getJSONTest();
+                      compareFiles();
                   });
                 },
               ),
@@ -254,6 +280,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
     );
   }
 }
+
 
 class Task {
   String name;
