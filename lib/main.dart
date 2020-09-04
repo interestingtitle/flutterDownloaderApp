@@ -258,6 +258,10 @@ class _flutterdownloaderState extends State<flutterdownloader> {
           child: ListView.builder(
             itemCount: file.length,
             itemBuilder: (context,index){
+              fileLocs.add(file[index].toString().replaceAll("File: ", "").replaceAll("'", ""));
+              filo = new File(fileLocs[index]);
+              length = filo.lengthSync().toDouble();
+              length = (length / 1024);
               return GestureDetector(
                 onTap: (){
                   setState(() {
@@ -281,7 +285,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                     ),
 
                   ),
-                  child: Center(child: Text(file[index].toString().replaceAll("File: ", "").replaceAll("'", ""), style: TextStyle(fontWeight: FontWeight.bold),)),
+                  child: Center(child: Text(file[index].toString().replaceAll("File: ", "").replaceAll("'", "") + "  " + length.toString() + " KB", style: TextStyle(fontWeight: FontWeight.bold),)),
 
                 ),
               );
