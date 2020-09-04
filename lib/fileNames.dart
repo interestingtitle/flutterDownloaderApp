@@ -5,15 +5,19 @@ import 'package:convert/convert.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+var fileLocs= new List<String>();
+var fileSizes= new List<String>();
 var files= new List<String>();
 int Counter = -1;
 String name = "";
 
+var filo;
+double length;
+
 String fileDirection = "";
 String directory;
 List file = new List();
-var filo = new File("storage/emulated/0/Android/data/bariscan.flutterdownloader/files/156561.png");
-double length = filo.lengthSync().toDouble();
+
 String size = length.toString();
 List <String> fileData=new List<String>();
 List jsonFileData=new List();
