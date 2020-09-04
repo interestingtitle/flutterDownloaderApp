@@ -182,7 +182,8 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                       setState(() {
                         _listofFiles();
                       });
-                      print(file[1].toString());
+                      length = (length/1024);
+                      print(size);
                     },
 
                   ),
@@ -210,6 +211,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 //            ),
 //          ),
 //        ),
+
         Expanded(
           child: ListView.builder(
             itemCount: file.length,
@@ -217,7 +219,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
               return GestureDetector(
                 onTap: (){
                   setState(() {
-                    fileDirection = "/storage/emulated/0/Android/data/bariscan.flutterdownloader/files/" + file[index];
+                    fileDirection = file[index].toString().replaceAll("File: ", "").replaceAll("'", "");
                     print(fileDirection);
                     OpenFile.open(fileDirection);
                   });
