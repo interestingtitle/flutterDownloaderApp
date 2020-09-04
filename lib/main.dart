@@ -59,6 +59,7 @@ void main() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
       // I am connected to a mobile network.
+      getJSONTest();
     }
     else if (connectivityResult == ConnectivityResult.wifi) {
     // I am connected to a wifi network.
