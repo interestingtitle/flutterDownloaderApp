@@ -102,7 +102,7 @@ class flutterdownloader extends StatefulWidget {
   _flutterdownloaderState createState() => _flutterdownloaderState();
 }
 
-
+String test;
 
 class _flutterdownloaderState extends State<flutterdownloader> {
 
