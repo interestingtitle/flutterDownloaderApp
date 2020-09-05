@@ -262,6 +262,8 @@ class _flutterdownloaderState extends State<flutterdownloader> {
               filo = new File(fileLocs[index]);
               length = filo.lengthSync().toDouble();
               length = (length / 1024);
+              IconData returnedIconName = getIcon(fileLocs[index],index);
+              print(fileLocs[index]);
               return GestureDetector(
                 onTap: (){
                   setState(() {
@@ -272,7 +274,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 
                 },
                 child: Container(
-                  height: 50,
+                  height: 70,
 
                   decoration: BoxDecoration(
                     color: Colors.blue[50],
@@ -281,11 +283,29 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                     ),
                     borderRadius: BorderRadius.circular(10.0),
                     gradient: LinearGradient(
-                      colors: [Colors.white, Colors.black26],
+                      colors: [Colors.white, Colors.lightBlueAccent],
                     ),
 
                   ),
-                  child: Center(child: Text(file[index].toString().replaceAll("File: ", "").replaceAll("'", "") + "  " + length.toString() + " KB", style: TextStyle(fontWeight: FontWeight.bold),)),
+                  child: Center(child:
+                  RichText(
+                    text: TextSpan(
+                      style: Theme.of(context).textTheme.bodyText1,
+                      children: [
+                        TextSpan(text: file[index].toString().replaceAll("File: ", "").replaceAll("'", "") + "  " + length.toString() + " KB"),
+                        WidgetSpan(
+
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                            child: Icon(returnedIconName),
+                          ),
+                        ),
+
+                      ],
+                    ),
+                  )
+
+                  ),
 
                 ),
               );
