@@ -55,18 +55,20 @@ Future printIps() async {
 }
 
 void main() async{
+  //#region FlutterDownloader plugin initialize
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterDownloader.initialize(
       debug: false // optional: set false to disable printing logs to console
   );
+  //#endregion
   runApp(downloader());
-
+  //#region Asking storage permission
   var status = await Permission.storage.status;
 
   if (!status.isGranted) {
     await Permission.storage.request();
   }
-
+  //#endregion
 
     appDirectory = (await getApplicationDocumentsDirectory()).path;
     printIps();
@@ -112,6 +114,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
   void requestDownload(String downloadFile) async{
     //
     var rnd = new Random();
+
     final taskId = await FlutterDownloader.enqueue(
         //url: "https://duckduckgo.com/i/0227507d.png",
         url: "http://"+serverIP+":"+serverPORT+"/download/"+downloadFile,
@@ -121,6 +124,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
         fileName: downloadFile,
         showNotification: true,
         openFileFromNotification: true);
+    //this function is needed for using flutter downloader plugin
   }
 
   @override
@@ -253,7 +257,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 //            ),
 //          ),
 //        ),
-
+//#region ListView builder
         Expanded(
           child: ListView.builder(
             itemCount: file.length,
@@ -261,7 +265,8 @@ class _flutterdownloaderState extends State<flutterdownloader> {
               fileLocs.add(file[index].toString().replaceAll("File: ", "").replaceAll("'", ""));
               filo = new File(fileLocs[index]);
               length = filo.lengthSync().toDouble();
-              length = (length / 1024);
+              length = (length / 1024)/1024;
+
               IconData returnedIconName = getIcon(fileLocs[index],index);
               print(fileLocs[index]);
               return GestureDetector(
@@ -274,14 +279,14 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 
                 },
                 child: Container(
-                  height: 70,
+                  height: 60,
 
                   decoration: BoxDecoration(
                     color: Colors.blue[50],
                     border: Border.all(
                       color: Colors.blue,
                     ),
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.vertical(),
                     gradient: LinearGradient(
                       colors: [Colors.white, Colors.lightBlueAccent],
                     ),
@@ -292,7 +297,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                     text: TextSpan(
                       style: Theme.of(context).textTheme.bodyText1,
                       children: [
-                        TextSpan(text: file[index].toString().replaceAll("File: ", "").replaceAll("'", "") + "  " + length.toString() + " KB"),
+                        TextSpan(text: file[index].toString().replaceAll("File: ", "").replaceAll("'", "").replaceAll("/storage/emulated/0/Android/data/bariscan.flutterdownloader/files/", "") + "   " + length.toStringAsFixed(2) + " KB   "),
                         WidgetSpan(
 
                           child: Padding(
@@ -312,7 +317,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
             },
           ),
         )
-
+//#endregion
         
       ],
       ),

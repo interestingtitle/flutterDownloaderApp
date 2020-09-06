@@ -37,6 +37,7 @@ Future getJSONTest() async
 }
 
 IconData getIcon(String x, int y){
+  //this function returns us an icon related with the file's type
   x = fileLocs[y].substring(fileLocs[y].length - 4);
   if(x == ".png"){
 
@@ -68,29 +69,5 @@ IconData getIcon(String x, int y){
     IconData iconName = Icons.image;
     return iconName;
   }
-//  if(x == ".png"){
-//    iconName = "music_note";
-//    return iconName;
-//  }
-//  if(x == ".png"){
-//    iconName = "music_note";
-//    return iconName;
-//  }
-//  if(x == ".png"){
-//    iconName = "music_note";
-//    return iconName;
-//  }
-//  if(x == ".png"){
-//    iconName = "music_note";
-//    return iconName;
-//  }
-//  if(x == ".png"){
-//    iconName = "music_note";
-//    return iconName;
-//  }
-//  if(x == ".png"){
-//    iconName = "music_note";
-//    return iconName;
-//  }
 }
 
