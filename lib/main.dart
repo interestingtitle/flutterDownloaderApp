@@ -104,7 +104,7 @@ void main() async{
     // I am connected to a wifi network.
     //getJSONTest();
     //discoverIpAddress();
-    getIpAddress();
+    await getIpAddress();
   }
   else {
     // I am not connected to the internet
@@ -186,7 +186,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
   Future<void> executeOrder() async{
     await _listofFiles();
     await getIpAddress();
-    await getJSONTest();
+    await Future.sync(() =>getJSONTest );
     await compareFiles();
     await _listofFiles();
   }
