@@ -25,15 +25,15 @@ void discoverIpAddress(String ipTemplate) async {
   // NetworkAnalyzer.discover2 pings all PORT:IP addresses at once.
 
   const port = 8000;
-  final stream = NetworkAnalyzer.discover2(
+  final stream = await NetworkAnalyzer.discover2(
     ipTemplate,
     port,
     timeout: Duration(milliseconds: 5000),
   );
 
   int found = 0;
-  stream.listen((NetworkAddress addr) {
-     //print('${addr.ip}:$port');
+  await stream.listen((NetworkAddress addr) {
+    //print('${addr.ip}:$port');
     if (addr.exists) {
       found++;
       print('Found Server IP: ${addr.ip}:$port');
@@ -41,7 +41,7 @@ void discoverIpAddress(String ipTemplate) async {
       serverPORT=port.toString();
       return;
     }
-  }).onDone(() => print('Done. Found Server IP.'));
+  });
 }
 
 void getIpAddress() async
@@ -50,7 +50,7 @@ void getIpAddress() async
   final String subnet = ip.substring(0, ip.lastIndexOf('.'));
   final int port = 80;
 
-  final stream = NetworkAnalyzer.discover2(subnet, port);
+  final stream = await NetworkAnalyzer.discover2(subnet, port);
   stream.listen((NetworkAddress addr) {
     if (addr.exists) {
       print("Connected by: "+ip);
@@ -73,6 +73,8 @@ Future printIps() async {
   }
 }
 
+
+
 void main() async{
   //#region FlutterDownloader plugin initialize
   WidgetsFlutterBinding.ensureInitialized();
@@ -89,24 +91,24 @@ void main() async{
   }
   //#endregion
 
-    appDirectory = (await getApplicationDocumentsDirectory()).path;
-    printIps();
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
-      // I am connected to a mobile network.
-      //getJSONTest();
+  appDirectory = (await getApplicationDocumentsDirectory()).path;
+  printIps();
+  var connectivityResult = await (Connectivity().checkConnectivity());
+  if (connectivityResult == ConnectivityResult.mobile) {
+    // I am connected to a mobile network.
+    //getJSONTest();
 
-    }
-    else if (connectivityResult == ConnectivityResult.wifi) {
+  }
+  else if (connectivityResult == ConnectivityResult.wifi) {
     // I am connected to a wifi network.
-      //getJSONTest();
-      //discoverIpAddress();
-      getIpAddress();
-    }
-    else {
-        // I am not connected to the internet
-    }
-    var abc=ConnectivityResult.values;
+    //getJSONTest();
+    //discoverIpAddress();
+    getIpAddress();
+  }
+  else {
+    // I am not connected to the internet
+  }
+  var abc=ConnectivityResult.values;
 }
 
 class downloader extends StatelessWidget {
@@ -135,15 +137,15 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 
 
 
-        final taskId =  FlutterDownloader.enqueue(
-          //url: "https://duckduckgo.com/i/0227507d.png",
-            url: "http://"+serverIP+":"+serverPORT+"/download/"+downloadFile,
-            //url: "http://192.168.43.195:8000"+"/download/"+downloadFile,
-            headers: {"auth": "test_for_sql_encoding"},
-            savedDir: '/storage/emulated/0/Android/data/bariscan.flutterdownloader/files',
-            fileName: downloadFile,
-            showNotification: true,
-            openFileFromNotification: true);
+    final taskId =  FlutterDownloader.enqueue(
+      //url: "https://duckduckgo.com/i/0227507d.png",
+        url: "http://"+serverIP+":"+serverPORT+"/download/"+downloadFile,
+        //url: "http://192.168.43.195:8000"+"/download/"+downloadFile,
+        headers: {"auth": "test_for_sql_encoding"},
+        savedDir: '/storage/emulated/0/Android/data/bariscan.flutterdownloader/files',
+        fileName: downloadFile,
+        showNotification: true,
+        openFileFromNotification: true);
 
     //this function is needed for using flutter downloader plugin
 
@@ -180,7 +182,13 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 
   }
 
-
+  Future<void> executeOrder() async{
+    await _listofFiles();
+    await getIpAddress();
+    await getJSONTest();
+    await compareFiles();
+    await _listofFiles();
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -188,48 +196,45 @@ class _flutterdownloaderState extends State<flutterdownloader> {
         title: Text('flutterdownloader'),
       ),
       body: Column(
-      children: <Widget>[
+        children: <Widget>[
 
-        Divider(),
+          Divider(),
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly ,
-          children: [
-            Tooltip(
-              message: 'Download',
-              child: FlatButton(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly ,
+            children: [
+              Tooltip(
+                message: 'Download',
+                child: FlatButton(
 
-                color: Colors.blue,
-                child: Icon(Icons.file_download),
-                onPressed: (){
-                  setState(() {
-                    files.clear();
-                    requestDownload("1.mp3");
-                    _listofFiles();
-
-                  });
-
-                },
-              ),
-            ),
-            Tooltip(
-              message: 'Sync Files',
-              child: FlatButton(
-                color: Colors.blue,
-                child: Icon(Icons.folder_open),
-                onPressed: (){
-                  setState(() {
+                  color: Colors.blue,
+                  child: Icon(Icons.file_download),
+                  onPressed: (){
+                    setState(() {
+                      files.clear();
+                      requestDownload("1.mp3");
                       _listofFiles();
-                     getIpAddress();
-                     Future.sync(() => getJSONTest());
-                     compareFiles();
-                      _listofFiles();
-                  });
-                },
+
+                    });
+
+                  },
+                ),
               ),
-            ),
-            Tooltip(
-              message: 'List all files',
+              Tooltip(
+                message: 'Sync Files',
+                child: FlatButton(
+                  autofocus: true,
+                  color: Colors.blue,
+                  child: Icon(Icons.folder_open),
+                  onPressed: (){
+                    setState(() {
+                      executeOrder();
+                    });
+                  },
+                ),
+              ),
+              Tooltip(
+                message: 'List all files',
 
                 child: GestureDetector(
 
@@ -247,11 +252,11 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                   ),
                 ),
 
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
 
-        Divider(),
+          Divider(),
 
 //        GestureDetector(
 //          onTap: () {
@@ -270,68 +275,68 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 //          ),
 //        ),
 //#region ListView builder
-        Expanded(
-          child: ListView.builder(
-            itemCount: file.length,
-            itemBuilder: (context,index){
-              files.add(file[index].toString().replaceAll("File: ", "").replaceAll("'", ""));
-              filo = new File(files[index]);
-              length = filo.lengthSync().toDouble();
-              length = (length / 1024)/1024;
+          Expanded(
+            child: ListView.builder(
+              itemCount: file.length,
+              itemBuilder: (context,index){
+                files.add(file[index].toString().replaceAll("File: ", "").replaceAll("'", ""));
+                filo = new File(files[index]);
+                length = filo.lengthSync().toDouble();
+                length = (length / 1024)/1024;
 
-              IconData returnedIconName = getIcon(files[index],index);
-              print(files[index]);
-              return GestureDetector(
-                onTap: (){
-                  setState(() {
-                    fileDirection = file[index].toString().replaceAll("File: ", "").replaceAll("'", "");
-                    print(fileDirection);
-                    OpenFile.open(fileDirection);
-                  });
+                IconData returnedIconName = getIcon(files[index],index);
+                print(files[index]);
+                return GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      fileDirection = file[index].toString().replaceAll("File: ", "").replaceAll("'", "");
+                      print(fileDirection);
+                      OpenFile.open(fileDirection);
+                    });
 
-                },
-                child: Container(
-                  height: 60,
+                  },
+                  child: Container(
+                    height: 60,
 
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    border: Border.all(
-                      color: Colors.blue,
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      border: Border.all(
+                        color: Colors.blue,
+                      ),
+                      borderRadius: BorderRadius.vertical(),
+                      gradient: LinearGradient(
+                        colors: [Colors.white, Colors.lightBlueAccent],
+                      ),
+
                     ),
-                    borderRadius: BorderRadius.vertical(),
-                    gradient: LinearGradient(
-                      colors: [Colors.white, Colors.lightBlueAccent],
-                    ),
+                    child: Center(child:
+                    RichText(
+                      text: TextSpan(
+                        style: Theme.of(context).textTheme.bodyText1,
+                        children: [
+                          TextSpan(text: file[index].toString().replaceAll("File: ", "").replaceAll("'", "").replaceAll("/storage/emulated/0/Android/data/bariscan.flutterdownloader/files/", "") + "   " + length.toStringAsFixed(2) + " MB   "),
+                          WidgetSpan(
 
-                  ),
-                  child: Center(child:
-                  RichText(
-                    text: TextSpan(
-                      style: Theme.of(context).textTheme.bodyText1,
-                      children: [
-                        TextSpan(text: file[index].toString().replaceAll("File: ", "").replaceAll("'", "").replaceAll("/storage/emulated/0/Android/data/bariscan.flutterdownloader/files/", "") + "   " + length.toStringAsFixed(2) + " MB   "),
-                        WidgetSpan(
-
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                            child: Icon(returnedIconName),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                              child: Icon(returnedIconName),
+                            ),
                           ),
-                        ),
 
-                      ],
+                        ],
+                      ),
+                    )
+
                     ),
-                  )
 
                   ),
-
-                ),
-              );
-            },
-          ),
-        )
+                );
+              },
+            ),
+          )
 //#endregion
-        
-      ],
+
+        ],
       ),
     );
   }
@@ -352,4 +357,3 @@ class Task {
     this.taskId = taskId;
   }
 }
-

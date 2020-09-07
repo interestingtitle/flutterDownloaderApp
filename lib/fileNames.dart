@@ -29,7 +29,7 @@ String iconName;
 
 Future getJSONTest() async
 {
-
+  print("getjsontest icindeyiz");
   var res = await http.get(Uri.parse("http://"+serverIP+":"+serverPORT+"/get_value"), headers: {"Accept": "application/json"});
   var resBody = json.decode(res.body);
   jsonFileData=resBody["filedata"] as List;
@@ -71,4 +71,3 @@ IconData getIcon(String x, int y){
     return iconName;
   }
 }
-
