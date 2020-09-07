@@ -92,12 +92,11 @@ void main() async{
   //#endregion
 
   appDirectory = (await getApplicationDocumentsDirectory()).path;
-  printIps();
+  await printIps();
   var connectivityResult = await (Connectivity().checkConnectivity());
   if (connectivityResult == ConnectivityResult.mobile) {
     // I am connected to a mobile network.
     //getJSONTest();
-    //anayın amını sikeyim android
 
   }
   else if (connectivityResult == ConnectivityResult.wifi) {
@@ -109,7 +108,6 @@ void main() async{
   else {
     // I am not connected to the internet
   }
-  var abc=ConnectivityResult.values;
 }
 
 class downloader extends StatelessWidget {
@@ -157,7 +155,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _listofFiles();
+   _listofFiles();
   }
 
   void _listofFiles() async {
@@ -171,7 +169,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
   {
     //jsonFileData.clear();
     //requestList.clear();
-    getJSONTest();
+    Future.sync(() => getJSONTest());
     jsonFileData.forEach((text) {
       //print(text['filename']);
       print("Requested Filename: "+text['filename']);
