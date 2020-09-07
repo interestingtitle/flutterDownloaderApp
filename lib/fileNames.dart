@@ -29,6 +29,7 @@ String iconName;
 
 Future getJSONTest() async
 {
+  var conn = await http.get(Uri.parse("http://"+serverIP+":"+serverPORT+"/est_conn"));
   print("getjsontest icindeyiz");
   var res = await http.get(Uri.parse("http://"+serverIP+":"+serverPORT+"/get_value"), headers: {"Accept": "application/json"});
   var resBody = json.decode(res.body);

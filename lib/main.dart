@@ -48,7 +48,7 @@ void getIpAddress() async
 {
   final String ip = await Wifi.ip;
   final String subnet = ip.substring(0, ip.lastIndexOf('.'));
-  final int port = 80;
+  final int port = 8000;
 
   final stream = await NetworkAnalyzer.discover2(subnet, port);
   stream.listen((NetworkAddress addr) {
@@ -104,6 +104,7 @@ void main() async{
     //getJSONTest();
     //discoverIpAddress();
     getIpAddress();
+    var conn = await http.get(Uri.parse("http://"+serverIP+":"+serverPORT+"/est_conn"));
   }
   else {
     // I am not connected to the internet
