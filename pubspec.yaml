@@ -33,10 +33,12 @@ dependencies:
   tap_debouncer: ^1.0.0
   convert: ^2.1.1
   http: ^0.12.2
+  wifi: ^0.1.5
+  ping_discover_network: ^0.2.0+1
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
-  ping_discover_network: ^0.2.0+1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

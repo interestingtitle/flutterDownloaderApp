@@ -18,14 +18,15 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:ping_discover_network/ping_discover_network.dart';
 import 'fileNames.dart';
+import 'package:wifi/wifi.dart';
 
-void discoverIpAddress() async {
+void discoverIpAddress(String ipTemplate) async {
   // NetworkAnalyzer.discover pings PORT:IP one by one according to timeout.
   // NetworkAnalyzer.discover2 pings all PORT:IP addresses at once.
 
   const port = 8000;
   final stream = NetworkAnalyzer.discover2(
-    '192.168.43',
+    ipTemplate,
     port,
     timeout: Duration(milliseconds: 5000),
   );
@@ -35,14 +36,32 @@ void discoverIpAddress() async {
      //print('${addr.ip}:$port');
     if (addr.exists) {
       found++;
-      print('Found device: ${addr.ip}:$port');
+      print('Found Server IP: ${addr.ip}:$port');
       serverIP=addr.ip.toString();
       serverPORT=port.toString();
       return;
     }
-  }).onDone(() => print('Finish. Found $found device(s)'));
+  }).onDone(() => print('Done. Found Server IP.'));
 }
 
+void getIpAddress() async
+{
+  final String ip = await Wifi.ip;
+  final String subnet = ip.substring(0, ip.lastIndexOf('.'));
+  final int port = 80;
+
+  final stream = NetworkAnalyzer.discover2(subnet, port);
+  stream.listen((NetworkAddress addr) {
+    if (addr.exists) {
+      print("Connected by: "+ip);
+      var _IPSplitList=ip.split(".");
+      //print(_list);
+      String setIPAdd=_IPSplitList[0]+'.'+_IPSplitList[1]+'.'+_IPSplitList[2];
+      print("Created template: "+setIPAdd);
+      discoverIpAddress(setIPAdd);
+    }
+  });
+}
 Future printIps() async {
   for (var interface in await NetworkInterface.list()) {
     print('== Interface: ${interface.name} ==');
@@ -75,13 +94,14 @@ void main() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
       // I am connected to a mobile network.
-      getJSONTest();
+      //getJSONTest();
 
     }
     else if (connectivityResult == ConnectivityResult.wifi) {
     // I am connected to a wifi network.
-      getJSONTest();
-      discoverIpAddress();
+      //getJSONTest();
+      //discoverIpAddress();
+      getIpAddress();
     }
     else {
         // I am not connected to the internet
@@ -111,20 +131,23 @@ class _flutterdownloaderState extends State<flutterdownloader> {
   List<Task> tasks;
 
   @override
-  void requestDownload(String downloadFile) async{
-    //
-    var rnd = new Random();
+  void requestDownload(String downloadFile) {
 
-    final taskId = await FlutterDownloader.enqueue(
-        //url: "https://duckduckgo.com/i/0227507d.png",
-        url: "http://"+serverIP+":"+serverPORT+"/download/"+downloadFile,
-        //url: "http://192.168.43.199:8000"+"/download/"+downloadFile,
-        headers: {"auth": "test_for_sql_encoding"},
-        savedDir: '/storage/emulated/0/Android/data/bariscan.flutterdownloader/files',
-        fileName: downloadFile,
-        showNotification: true,
-        openFileFromNotification: true);
+
+
+        final taskId =  FlutterDownloader.enqueue(
+          //url: "https://duckduckgo.com/i/0227507d.png",
+            url: "http://"+serverIP+":"+serverPORT+"/download/"+downloadFile,
+            //url: "http://192.168.43.195:8000"+"/download/"+downloadFile,
+            headers: {"auth": "test_for_sql_encoding"},
+            savedDir: '/storage/emulated/0/Android/data/bariscan.flutterdownloader/files',
+            fileName: downloadFile,
+            showNotification: true,
+            openFileFromNotification: true);
+
     //this function is needed for using flutter downloader plugin
+
+
   }
 
   @override
@@ -143,27 +166,16 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 
   void compareFiles()
   {
+    //jsonFileData.clear();
+    //requestList.clear();
+    getJSONTest();
+    jsonFileData.forEach((text) {
+      //print(text['filename']);
+      print("Requested Filename: "+text['filename']);
+      requestList.add(text['filename']);
+      requestDownload(text['filename']);
+    });
 
-    requestList.clear();
-    Future.sync(() => getJSONTest);
-    for(int i=0;i<10;i++)
-    {
-      String plainText=jsonFileData.elementAt(i).toString();
-      var plainTextArray=plainText.split("{filename: ");
-      //print(jsonFileData.elementAt(i));
-      //print(fileData.elementAt(i));
-      //print(plainTextArray);
-      //print( plainTextArray.elementAt(1));
-      plainText=plainTextArray.elementAt(1).toString();
-      //print(plainText);
-      plainTextArray=plainText.split(".mp3");
-      //print("->"+ plainTextArray.elementAt(0));
-      String musicFileName=plainTextArray.elementAt(0).toString()+".mp3";
-      print("Requested Filename: "+musicFileName);
-      requestList.add(musicFileName);
-      requestDownload(musicFileName);
-      _listofFiles();
-    }
     print(requestList);
 
   }
@@ -208,10 +220,10 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                 onPressed: (){
                   setState(() {
                       _listofFiles();
-                    //openFile();;
-                      Future.sync(() => getJSONTest());
-                      compareFiles();
-
+                     getIpAddress();
+                     Future.sync(() => getJSONTest());
+                     compareFiles();
+                      _listofFiles();
                   });
                 },
               ),
@@ -262,13 +274,13 @@ class _flutterdownloaderState extends State<flutterdownloader> {
           child: ListView.builder(
             itemCount: file.length,
             itemBuilder: (context,index){
-              fileLocs.add(file[index].toString().replaceAll("File: ", "").replaceAll("'", ""));
-              filo = new File(fileLocs[index]);
+              files.add(file[index].toString().replaceAll("File: ", "").replaceAll("'", ""));
+              filo = new File(files[index]);
               length = filo.lengthSync().toDouble();
               length = (length / 1024)/1024;
 
-              IconData returnedIconName = getIcon(fileLocs[index],index);
-              print(fileLocs[index]);
+              IconData returnedIconName = getIcon(files[index],index);
+              print(files[index]);
               return GestureDetector(
                 onTap: (){
                   setState(() {
@@ -297,7 +309,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                     text: TextSpan(
                       style: Theme.of(context).textTheme.bodyText1,
                       children: [
-                        TextSpan(text: file[index].toString().replaceAll("File: ", "").replaceAll("'", "").replaceAll("/storage/emulated/0/Android/data/bariscan.flutterdownloader/files/", "") + "   " + length.toStringAsFixed(2) + " KB   "),
+                        TextSpan(text: file[index].toString().replaceAll("File: ", "").replaceAll("'", "").replaceAll("/storage/emulated/0/Android/data/bariscan.flutterdownloader/files/", "") + "   " + length.toStringAsFixed(2) + " MB   "),
                         WidgetSpan(
 
                           child: Padding(

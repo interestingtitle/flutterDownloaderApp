@@ -29,7 +29,8 @@ String iconName;
 
 Future getJSONTest() async
 {
-  var res = await http.get(Uri.parse("http://192.168.43.199:8000/get_value"), headers: {"Accept": "application/json"});
+
+  var res = await http.get(Uri.parse("http://"+serverIP+":"+serverPORT+"/get_value"), headers: {"Accept": "application/json"});
   var resBody = json.decode(res.body);
   jsonFileData=resBody["filedata"] as List;
   print("Getting file list data from server : Done.");
@@ -38,7 +39,7 @@ Future getJSONTest() async
 
 IconData getIcon(String x, int y){
   //this function returns us an icon related with the file's type
-  x = fileLocs[y].substring(fileLocs[y].length - 4);
+  x = files[y].substring(files[y].length - 4);
   if(x == ".png"){
 
     IconData iconName = Icons.image;
