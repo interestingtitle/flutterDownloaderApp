@@ -20,7 +20,7 @@ import 'package:ping_discover_network/ping_discover_network.dart';
 import 'fileNames.dart';
 import 'package:wifi/wifi.dart';
 
-void discoverIpAddress(String ipTemplate) async {
+Future discoverIpAddress(String ipTemplate) async {
   // NetworkAnalyzer.discover pings PORT:IP one by one according to timeout.
   // NetworkAnalyzer.discover2 pings all PORT:IP addresses at once.
 
@@ -58,7 +58,7 @@ void getIpAddress() async
       //print(_list);
       String setIPAdd=_IPSplitList[0]+'.'+_IPSplitList[1]+'.'+_IPSplitList[2];
       print("Created template: "+setIPAdd);
-      await discoverIpAddress(setIPAdd);
+      discoverIpAddress(setIPAdd);
     }
   });
 }
