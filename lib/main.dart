@@ -48,7 +48,7 @@ void getIpAddress() async
 {
   final String ip = await Wifi.ip;
   final String subnet = ip.substring(0, ip.lastIndexOf('.'));
-  final int port = 80;
+  final int port = 8000;
 
   final stream = await NetworkAnalyzer.discover2(subnet, port);
   stream.listen((NetworkAddress addr) {
@@ -58,7 +58,7 @@ void getIpAddress() async
       //print(_list);
       String setIPAdd=_IPSplitList[0]+'.'+_IPSplitList[1]+'.'+_IPSplitList[2];
       print("Created template: "+setIPAdd);
-      discoverIpAddress(setIPAdd);
+      await discoverIpAddress(setIPAdd);
     }
   });
 }
