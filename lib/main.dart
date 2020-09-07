@@ -39,7 +39,7 @@ Future discoverIpAddress(String ipTemplate) async {
       print('Found Server IP: ${addr.ip}:$port');
       serverIP=addr.ip.toString();
       serverPORT=port.toString();
-      return;
+
     }
   });
 }
@@ -169,7 +169,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
   {
     //jsonFileData.clear();
     //requestList.clear();
-    Future.sync(() => getJSONTest());
+    getJSONTest();
     jsonFileData.forEach((text) {
       //print(text['filename']);
       print("Requested Filename: "+text['filename']);
@@ -184,7 +184,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
   Future<void> executeOrder() async{
     await _listofFiles();
     await getIpAddress();
-    await Future.sync(() =>getJSONTest );
+    await getJSONTest();
     await compareFiles();
     await _listofFiles();
   }
