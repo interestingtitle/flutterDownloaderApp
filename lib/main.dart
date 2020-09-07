@@ -97,6 +97,7 @@ void main() async{
   if (connectivityResult == ConnectivityResult.mobile) {
     // I am connected to a mobile network.
     //getJSONTest();
+    //anayın amını sikeyim android
 
   }
   else if (connectivityResult == ConnectivityResult.wifi) {
