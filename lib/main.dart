@@ -81,6 +81,55 @@ class flutterdownloader extends StatefulWidget {
 String test;
 
 class _flutterdownloaderState extends State<flutterdownloader> {
+  Widget build(BuildContext context) {
+    return new SplashScreen(
+        seconds: 14,
+        navigateAfterSeconds: new AfterSplash(),
+        title: new Text('Welcome In SplashScreen',
+          style: new TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20.0
+          ),),
+        image: new Image.network('https://i.imgur.com/TyCSG9A.png'),
+        backgroundColor: Colors.white,
+        styleTextUnderTheLoader: new TextStyle(),
+        photoSize: 100.0,
+        onClick: ()=>print("Flutter Egypt"),
+        loaderColor: Colors.red
+    );
+  }
+}
+
+class AfterSplash extends StatefulWidget {
+  @override
+  _AfterSplashState createState() => _AfterSplashState();
+}
+
+class _AfterSplashState extends State<AfterSplash> {
+
+  bool _tryAgain = false;
+
+  _checkWifi() async {
+    // the method below returns a Future
+    var connectivityResult = await (new Connectivity().checkConnectivity());
+    bool connectedToWifi = (connectivityResult == ConnectivityResult.wifi);
+    if (!connectedToWifi) {
+      _showAlert(context);
+    }
+    if (_tryAgain != !connectedToWifi) {
+      setState(() => _tryAgain = !connectedToWifi);
+    }
+  }
+
+  void _showAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Wifi"),
+          content: Text("Wifi not detected. Please activate it."),
+        )
+    );
+  }
 
   List<Task> tasks;
 
@@ -105,7 +154,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
     var rnd = new Random();
     var test=rnd.nextInt(700000)+100000;
     final taskId =  FlutterDownloader.enqueue(
-      url: "https://duckduckgo.com/i/0227507d.png",
+        url: "https://duckduckgo.com/i/0227507d.png",
         //url: "http://"+serverIP+":"+serverPORT+"/download/"+downloadFile,
         //url: "http://192.168.43.195:8000"+"/download/"+downloadFile,
         headers: {"auth": "test_for_sql_encoding"},
@@ -123,7 +172,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
   void initState() {
     // TODO: implement initState
     super.initState();
-   _listofFiles();
+    _listofFiles();
   }
 
   void _listofFiles() async {
@@ -171,6 +220,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
 
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -192,8 +242,8 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                   child: Icon(Icons.file_download),
 
                   onPressed: (){
-                   // getInterfaceInfo();
-                  setState(() {
+                    // getInterfaceInfo();
+                    setState(() {
                       //requestDownload("1.mp3");
                       dummyDownload();
                       //_listofFiles();
@@ -212,6 +262,7 @@ class _flutterdownloaderState extends State<flutterdownloader> {
                   onPressed: (){
                     exe2();
                     setState(() {
+                      _checkWifi();
                       _listofFiles();
                     });
                   },
@@ -303,10 +354,13 @@ class _flutterdownloaderState extends State<flutterdownloader> {
         ],
       ),
     );
-
   }
-
 }
+
+
+
+
+
 
 
 class Task {
