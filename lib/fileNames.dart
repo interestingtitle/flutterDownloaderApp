@@ -32,8 +32,8 @@ import 'package:splashscreen/splashscreen.dart';
 
 var fileLocs = new List<String>();
 var files= new List<String>();
-String serverIP="";
-String serverPORT="";
+String serverIP="192.168.2.128";
+String serverPORT="8000";
 int Counter = -1;
 String name;
 String appDirectory;
@@ -85,6 +85,7 @@ Future <void> getServerFileJSONData() async
 
 }
 Future <void> discoverIpAddress() async {
+    print('Checking for server');
     int port= int.parse(serverPORT);
     var stream2 =  NetworkAnalyzer.discover2(
       setIPAdd,
@@ -94,7 +95,7 @@ Future <void> discoverIpAddress() async {
 
     int found = 0;
     stream2.listen((NetworkAddress addr) {
-      //print('${addr.ip}:$port');
+      print('${addr.ip}:$port');
       if (addr.exists) {
         found++;
         print('Found Server IP: ${addr.ip}:$port');
@@ -114,7 +115,7 @@ Future <void> createTemplateForIP() async{
     if (addr.exists) {
       print("Connected by: "+ip);
       var _IPSplitList=ip.split(".");
-      //print(_list);
+      print(_IPSplitList);
       setIPAdd=_IPSplitList[0]+'.'+_IPSplitList[1]+'.'+_IPSplitList[2];
       print("Created template: "+setIPAdd);
       discoverIpAddress();

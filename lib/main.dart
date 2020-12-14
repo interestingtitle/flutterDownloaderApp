@@ -26,6 +26,7 @@ import 'package:splashscreen/splashscreen.dart';
 
 
 void main() async{
+
   //#region FlutterDownloader plugin initialize
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterDownloader.initialize(
@@ -33,6 +34,7 @@ void main() async{
   );
   //#endregion
   runApp(downloader());
+  establishConnection();
   //#region Asking storage permission
   var status = await Permission.storage.status;
 
@@ -43,20 +45,19 @@ void main() async{
 
   appDirectory = (await getApplicationDocumentsDirectory()).path;
 
-
   var connectivityResult = await (Connectivity().checkConnectivity());
   if (connectivityResult == ConnectivityResult.mobile) {
     // I am connected to a mobile network.
     //getJSONTest();
+
   }
   else if (connectivityResult == ConnectivityResult.wifi) {
     // I am connected to a wifi network.
-
+    establishConnection();
   }
   else {
     // I am not connected to the internet
   }
-  await establishConnection();
   //await getServerFileJSONData();
   fileSync();
 
@@ -83,14 +84,14 @@ String test;
 class _flutterdownloaderState extends State<flutterdownloader> {
   Widget build(BuildContext context) {
     return new SplashScreen(
-        seconds: 14,
+        seconds: 10,
         navigateAfterSeconds: new AfterSplash(),
         title: new Text('Welcome In SplashScreen',
           style: new TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 20.0
           ),),
-        image: new Image.network('https://i.imgur.com/TyCSG9A.png'),
+        image: new Image.network('https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png'),
         backgroundColor: Colors.white,
         styleTextUnderTheLoader: new TextStyle(),
         photoSize: 100.0,
@@ -110,6 +111,7 @@ class _AfterSplashState extends State<AfterSplash> {
   bool _tryAgain = false;
 
   _checkWifi() async {
+    discoverIpAddress();
     // the method below returns a Future
     var connectivityResult = await (new Connectivity().checkConnectivity());
     bool connectedToWifi = (connectivityResult == ConnectivityResult.wifi);
@@ -135,7 +137,7 @@ class _AfterSplashState extends State<AfterSplash> {
 
   @override
   void requestDownload(String downloadFile) async {
-
+    //establishConnection();
     final taskId =  FlutterDownloader.enqueue(
       //url: "https://duckduckgo.com/i/0227507d.png",
         url: "http://"+serverIP+":"+serverPORT+"/download/"+downloadFile,
@@ -151,10 +153,12 @@ class _AfterSplashState extends State<AfterSplash> {
   }
   @override
   void dummyDownload() async {
+
     var rnd = new Random();
     var test=rnd.nextInt(700000)+100000;
     final taskId =  FlutterDownloader.enqueue(
-        url: "https://duckduckgo.com/i/0227507d.png",
+        url: "http://"+serverIP+":"+serverPORT+"/download/"+"abc.png",
+        //url: "https://duckduckgo.com/i/0227507d.png",
         //url: "http://"+serverIP+":"+serverPORT+"/download/"+downloadFile,
         //url: "http://192.168.43.195:8000"+"/download/"+downloadFile,
         headers: {"auth": "test_for_sql_encoding"},
@@ -242,11 +246,11 @@ class _AfterSplashState extends State<AfterSplash> {
                   child: Icon(Icons.file_download),
 
                   onPressed: (){
-                    // getInterfaceInfo();
+                    //establishConnection();
                     setState(() {
-                      //requestDownload("1.mp3");
-                      dummyDownload();
-                      //_listofFiles();
+                      requestDownload("abc.png");
+                      //dummyDownload();
+                      _listofFiles();
 
                     });
 
